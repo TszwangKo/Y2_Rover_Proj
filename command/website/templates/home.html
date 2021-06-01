@@ -1,0 +1,72 @@
+{% extends "base.html" %} {% block title %}Mars Rover Control Panel{% endblock %} 
+{% block content %} 
+<h1 style="text-align:center">Mars Rover Project Control Panel</h1>
+<br />
+
+<h2 style="text-align:center">Commands</h2>
+
+<form method="POST">
+    <input type="submit" name="action" value="Forward" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Backward" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Turn Left" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Turn Right" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Clear Logs" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Update" class="btn btn-primary"/>
+</form>
+
+<br />
+
+<h2 style="text-align:center">Rover Status</h2>
+
+{{"Battery: "}} {{battery}} {{"%"}}
+
+{% if battery == 100 %}
+
+<img src="{{ url_for('static', filename='battery_100.jpg') }}" alt="Percentage: 100 %">
+
+{% elif battery >= 75 %}
+
+<img src="{{ url_for('static', filename='battery_75.jpg') }}" alt="Percentage: 75 %">
+
+{% elif battery >= 50 %}
+
+<img src="{{ url_for('static', filename='battery_50.jpg') }}" alt="Percentage: 50 %">
+
+{% elif battery >= 25 %}
+
+<img src="{{ url_for('static', filename='battery_25.jpg') }}" alt="Percentage: 25 %">
+
+{% else %}
+
+<img src="{{ url_for('static', filename='battery_0.jpg') }}" alt="Percentage: 0 %">
+
+{% endif %}
+
+<br />
+
+{{"Speed: "}} {{speed}} 
+
+<br />
+
+<h2 style="text-align:center">Action Log</h2>
+
+{% for action in log%}
+    {{action[0]}} {{" - "}} {{action[1]}}
+    <br />
+{% endfor %}
+
+<br />
+
+<h2 style="text-align:center">Items in the database</h2>
+
+{% for item in items %}
+
+    {{"ID: "}}{{ item.id }}{{" "}}
+    {{"x_location: "}}{{ item.x_location }}{{" "}}
+    {{"y_location: "}}{{ item.y_location}}{{" "}}
+
+{% endfor %}
+
+
+
+{% endblock %}
