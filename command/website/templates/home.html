@@ -6,19 +6,110 @@
 <h2 style="text-align:center">Commands</h2>
 
 <form method="POST">
+    <h3 style="text-align:left">Setups</h3>
+    <input type="submit" name="action" value="Connect/Disconnect" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Update" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Clear Logs" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Clear Path" class="btn btn-primary"/>
+    <input type="submit" name="action" onclick="return validate();" value="Clear Database" class="btn btn-primary"/>
+    <script>
+        function validate() {
+            return confirm("Press OK to delete!");
+        }
+    </script>
+    <br/>
+    <br/>
+
+    <h3 style="text-align:left">Basic Commands</h3>
+    <div class="form-group">
+        <label for="distance_degree">Distance/Degree</label>
+        <input
+          type="number"
+          class="form-control"
+          id="distance_degree"
+          name="distance_degree"
+          placeholder="Enter distance/degree"
+        />
+    </div>
     <input type="submit" name="action" value="Forward" class="btn btn-primary"/>
     <input type="submit" name="action" value="Backward" class="btn btn-primary"/>
     <input type="submit" name="action" value="Turn Left" class="btn btn-primary"/>
     <input type="submit" name="action" value="Turn Right" class="btn btn-primary"/>
-    <input type="submit" name="action" value="Clear Logs" class="btn btn-primary"/>
-    <input type="submit" name="action" value="Update" class="btn btn-primary"/>
+    <br/>
+    <br/>
+
+    <h3 style="text-align:left">Advance Commands</h3>
+    <div class="form-group">
+    <label for="width">Search Area Width-y axis</label>
+    <input
+        type="number"
+        class="form-control"
+        id="width"
+        name="width"
+        placeholder="Enter width for search area"
+    />
+    </div>
+    <div class="form-group">
+    <label for="length">Search Area Length-x axis</label>
+    <input
+        type="number"
+        class="form-control"
+        id="length"
+        name="length"
+        placeholder="Enter length for search area"
+    />
+    </div>
+    <div class="form-group">
+        <label for="x_cordinate">x cordinate of target</label>
+        <input
+            type="number"
+            class="form-control"
+            id="x_cordinate"
+            name="x_cordinate"
+            placeholder="Enter x cordinate of target"
+        />
+    </div>
+    <div class="form-group">
+        <label for="y_cordinate">y cordinate of target</label>
+        <input
+            type="number"
+            class="form-control"
+            id="y_cordinate"
+            name="y_cordinate"
+            placeholder="Enter y cordinate of target"
+        />
+    </div>
+    <label for="item">Choose an item:</label>
+    <select id="item" name="item">
+        {% for item in items %}
+        <option value = {{ item.id }}>{{ item.id }}</option>
+        {% endfor %}
+    </select>
+    <br/>
+    <input type="submit" name="action" value="Move to Item" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Move to Point" class="btn btn-primary"/>
+    <input type="submit" name="action" value="Search Area" class="btn btn-primary"/>
 </form>
 
 <br />
 
 <h2 style="text-align:center">Rover Status</h2>
 
+{% if connected %}
+
+Network Status: Connected
+
+{% else %}
+
+Network Status: Disconnected
+
+{% endif %}
+
+&nbsp;&nbsp;
+
 {{"Battery: "}} {{battery}} {{"%"}}
+
+&nbsp;
 
 {% if battery == 100 %}
 
@@ -42,31 +133,52 @@
 
 {% endif %}
 
-<br />
+&nbsp;&nbsp;
 
 {{"Speed: "}} {{speed}} 
 
-<br />
-
-<h2 style="text-align:center">Action Log</h2>
+<h2 style="text-align:center">Action/Response Log</h2>
 
 {% for action in log%}
-    {{action[0]}} {{" - "}} {{action[1]}}
+    {{action[0]}} {{" - "}} {{action[1]}} {{" - "}} {{action[2]}}
     <br />
 {% endfor %}
 
 <br />
 
-<h2 style="text-align:center">Items in the database</h2>
+<div class="wrapper">
+    <div id="chart"></div>
+    <script>
+        var data = JSON.parse('{{ data | tojson | safe}}');
+        var path = JSON.parse('{{ path | tojson | safe}}');
+        var trace1 = {
+            x: data['x'],
+            y: data['y'],
+            mode: 'markers',
+            type: 'scatter',
+            text: data['text'],
+            marker: { size: 12 }
+        };
 
-{% for item in items %}
+        var trace2 = {
+            x: path['x'],
+            y: path['y'],
+            mode: 'lines+markers',
+            type: 'scatter',
+            marker: { size: 12 }
+        }
 
-    {{"ID: "}}{{ item.id }}{{" "}}
-    {{"x_location: "}}{{ item.x_location }}{{" "}}
-    {{"y_location: "}}{{ item.y_location}}{{" "}}
+        var plot_data = [ trace1 ,trace2 ];
 
-{% endfor %}
+        var layout = {
+            title:'Area Map'
+        };
 
-
+        Plotly.newPlot('chart', plot_data, layout);
+        
+    </script>
+</div>
 
 {% endblock %}
+
+   
