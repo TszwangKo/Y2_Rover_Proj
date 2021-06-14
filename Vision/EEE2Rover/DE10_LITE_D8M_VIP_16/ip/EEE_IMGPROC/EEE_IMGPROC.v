@@ -481,6 +481,16 @@ reg	[8:0]		green_hl, green_hu;
 reg	[8:0]		red_hl, red_hu;
 reg	[8:0]		yellow_hl, yellow_hu;
 reg	[8:0]		pink_hl, pink_hu;
+reg	[7:0]		blue_sl, blue_su;
+reg	[7:0]		green_sl, green_su;
+reg	[7:0]		red_sl, red_su;
+reg	[7:0]		yellow_sl, yellow_su;
+reg	[7:0]		pink_sl, pink_su;
+reg	[7:0]		blue_vl, blue_vu;
+reg	[7:0]		green_vl, green_vu;
+reg	[7:0]		red_vl, red_vu;
+reg	[7:0]		yellow_vl, yellow_vu;
+reg	[7:0]		pink_vl, pink_vu;
 
 integer step = 9'd5;
 always @ (posedge clk)
@@ -491,14 +501,40 @@ begin
 		bb_col <= BB_COL_DEFAULT;
 		blue_hl <= 9'd200;
 		blue_hu <= 9'd230;
+		blue_sl <= 8'd0;
+		blue_su <= 8'hff;
+		blue_vl <= 8'd0;
+		blue_vu <= 8'hff;
+		
 		green_hl <= 9'd150;
 		green_hu <= 9'd190;
+		green_sl <= 8'd0;
+		green_su <= 8'hff;
+		green_vl <= 8'd0;
+		green_vu <= 8'hff;
+		
 		red_hl <= 9'd0;
 		red_hu <= 9'd40;
+		red_sl <= 8'd0;
+		red_su <= 8'hff;
+		red_vl <= 8'd0;
+		red_vu <= 8'hff;
+		
 		yellow_hl <= 9'd60;
 		yellow_hu <= 9'd90;
+		yellow_sl <= 8'd0;
+		yellow_su <= 8'hff;
+		yellow_vl <= 8'd0;
+		yellow_vu <= 8'hff;
+		
 		pink_hl <= 9'd260;
 		pink_hu <= 9'd320;
+		pink_sl <= 8'd0;
+		pink_su <= 8'hff;
+		pink_vl <= 8'd0;
+		pink_vu <= 8'hff;
+		
+		
 	end
 	else begin
 		if(s_chipselect & s_write) begin
@@ -512,7 +548,26 @@ begin
 							blue_hu <= blue_hu + step;
 						end else if (s_writedata[31:0] == 32'h0004) begin
 							blue_hu <= blue_hu - step;
+						end else if (s_writedata[31:0] == 32'h0005) begin
+							blue_sl <= blue_hu + step;
+						end else if (s_writedata[31:0] == 32'h0006) begin
+							blue_sl <= blue_hu - step;
+						end else if (s_writedata[31:0] == 32'h0007) begin
+							blue_su <= blue_hu + step;
+						end else if (s_writedata[31:0] == 32'h0008) begin
+							blue_su <= blue_hu - step;
+						end else if (s_writedata[31:0] == 32'h0009) begin
+							blue_vl <= blue_hu + step;
+						end else if (s_writedata[31:0] == 32'h000a) begin
+							blue_vl <= blue_hu - step;
+						end else if (s_writedata[31:0] == 32'h000b) begin
+							blue_vu <= blue_hu + step;
+						end else if (s_writedata[31:0] == 32'h000c) begin
+							blue_vu <= blue_hu - step;
 						end 
+						
+						
+						
 						else if(s_writedata[31:0] == 32'h1001) begin
 							green_hl <= green_hl + step;
 						end else if (s_writedata[31:0] == 32'h1002) begin
@@ -521,6 +576,22 @@ begin
 							green_hu <= green_hu + step;
 						end else if (s_writedata[31:0] == 32'h1004) begin
 							green_hu <= green_hu - step;
+						end else if (s_writedata[31:0] == 32'h1005) begin
+							green_sl <= green_hu + step;
+						end else if (s_writedata[31:0] == 32'h1006) begin
+							green_sl <= green_hu - step;
+						end else if (s_writedata[31:0] == 32'h1007) begin
+							green_su <= green_hu + step;
+						end else if (s_writedata[31:0] == 32'h1008) begin
+							green_su <= green_hu - step;
+						end else if (s_writedata[31:0] == 32'h1009) begin
+							green_vl <= green_hu + step;
+						end else if (s_writedata[31:0] == 32'h100a) begin
+							green_vl <= green_hu - step;
+						end else if (s_writedata[31:0] == 32'h100b) begin
+							green_vu <= green_hu + step;
+						end else if (s_writedata[31:0] == 32'h100c) begin
+							green_vu <= green_hu - step;
 						end 
 						else if(s_writedata[31:0] == 32'h2001) begin
 							red_hl <= red_hl + step;
@@ -530,7 +601,24 @@ begin
 							red_hu <= red_hu + step;
 						end else if (s_writedata[31:0] == 32'h2004) begin
 							red_hu <= red_hu - step;
+						end else if (s_writedata[31:0] == 32'h2005) begin
+							red_sl <= red_hu + step;
+						end else if (s_writedata[31:0] == 32'h2006) begin
+							red_sl <= red_hu - step;
+						end else if (s_writedata[31:0] == 32'h2007) begin
+							red_su <= red_hu + step;
+						end else if (s_writedata[31:0] == 32'h2008) begin
+							red_su <= red_hu - step;
+						end else if (s_writedata[31:0] == 32'h2009) begin
+							red_vl <= red_hu + step;
+						end else if (s_writedata[31:0] == 32'h200a) begin
+							red_vl <= red_hu - step;
+						end else if (s_writedata[31:0] == 32'h200b) begin
+							red_vu <= red_hu + step;
+						end else if (s_writedata[31:0] == 32'h200c) begin
+							red_vu <= red_hu - step;
 						end 
+						
 						else if(s_writedata[31:0] == 32'h3001) begin
 							yellow_hl <= yellow_hl + step;
 						end else if (s_writedata[31:0] == 32'h3002) begin
@@ -539,6 +627,22 @@ begin
 							yellow_hu <= yellow_hu + step;
 						end else if (s_writedata[31:0] == 32'h3004) begin
 							yellow_hu <= yellow_hu - step;
+						end  else if (s_writedata[31:0] == 32'h3005) begin
+							yellow_sl <= yellow_hu + step;
+						end else if (s_writedata[31:0] == 32'h3006) begin
+							yellow_sl <= yellow_hu - step;
+						end else if (s_writedata[31:0] == 32'h3007) begin
+							yellow_su <= yellow_hu + step;
+						end else if (s_writedata[31:0] == 32'h3008) begin
+							yellow_su <= yellow_hu - step;
+						end else if (s_writedata[31:0] == 32'h3009) begin
+							yellow_vl <= yellow_hu + step;
+						end else if (s_writedata[31:0] == 32'h300a) begin
+							yellow_vl <= yellow_hu - step;
+						end else if (s_writedata[31:0] == 32'h300b) begin
+							yellow_vu <= yellow_hu + step;
+						end else if (s_writedata[31:0] == 32'h300c) begin
+							yellow_vu <= yellow_hu - step;
 						end 
 						else if(s_writedata[31:0] == 32'h4001) begin
 							pink_hl <= pink_hl + step;
@@ -548,6 +652,22 @@ begin
 							pink_hu <= pink_hu + step;
 						end else if (s_writedata[31:0] == 32'h4004) begin
 							pink_hu <= pink_hu - step;
+						end else if (s_writedata[31:0] == 32'h4005) begin
+							pink_sl <= pink_hu + step;
+						end else if (s_writedata[31:0] == 32'h4006) begin
+							pink_sl <= pink_hu - step;
+						end else if (s_writedata[31:0] == 32'h4007) begin
+							pink_su <= pink_hu + step;
+						end else if (s_writedata[31:0] == 32'h4008) begin
+							pink_su <= pink_hu - step;
+						end else if (s_writedata[31:0] == 32'h4009) begin
+							pink_vl <= pink_hu + step;
+						end else if (s_writedata[31:0] == 32'h400a) begin
+							pink_vl <= pink_hu - step;
+						end else if (s_writedata[31:0] == 32'h400b) begin
+							pink_vu <= pink_hu + step;
+						end else if (s_writedata[31:0] == 32'h400c) begin
+							pink_vu <= pink_hu - step;
 						end 
 						else if(s_writedata[31:0] == 32'h0100) begin
 							filter_mode <= !filter_mode;

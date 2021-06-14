@@ -43,11 +43,27 @@
 #define MIPI_REG_MDLErrCnt		0x0090
 
 int blue_hl = 200, blue_hu = 230;
+int blue_sl = 0, blue_su = 0xff;
+int blue_vl = 0, blue_vu = 0xff;
+
 int green_hl = 150, green_hu = 190;
+int green_sl = 0, green_su = 0xff;
+int green_vl = 0, green_vu = 0xff;
+
 int red_hl = 0, red_hu = 40;
+int red_sl = 0, red_su = 0xff;
+int red_vl = 0, red_vu = 0xff;
+
 int yellow_hl = 60, yellow_hu = 90;
+int yellow_sl = 0, yellow_su = 0xff;
+int yellow_vl = 0, yellow_vu = 0xff;
+
 int pink_hl = 260, pink_hu = 320;
+int pink_sl = 0, pink_su = 0xff;
+int pink_vl = 0, pink_vu = 0xff;
+
 int filtered = 0;
+int mode = 0;
 
 
 void mipi_clear_error(void) {
@@ -261,10 +277,13 @@ int main() {
 			int word = IORD(0x42000, EEE_IMGPROC_MSG); //Get next word from message buffer
 			if (fwrite(&word, 4, 1, ser) != 1)
 				printf("Error writing to UART");
-			if (word == EEE_IMGPROC_MSG_START_R){
+
+			if( mode == 1){
+				continue;
+			}else if (word == EEE_IMGPROC_MSG_START_R){
 				color = 'r';
 				stage = 1;
-								printf("red   : ");
+				printf("red   : ");
 			}else if(word == EEE_IMGPROC_MSG_START_G){
 				color = 'g';
 				stage = 1;
@@ -300,8 +319,8 @@ int main() {
 					angle = 0;
 				}else if ( x_diff > 50 && x_diff < 580){
 					x_dis = 4900/x_diff;
-					;//(x_center-320)/320*25; // percentage of screen converted into degrees;
-					fprintf(ser,"%s,%3d,%3d",color,angle,x_dis);
+					//(x_center-320)/320*25; // percentage of screen converted into degrees;
+					fprintf(ser,"%i,%d,%d\n",color,angle,x_dis);
 				}
 				printf("angle: %3d ",angle);
 				printf("distance: %3d \n",x_dis);
@@ -335,31 +354,31 @@ int main() {
 		int hue_step = 5;
 		int in = getchar();
 		switch (in) {
-		case 'z': {
+		case 'J': {
 			exposureTime += EXPOSURE_STEP;
 			OV8865SetExposure(exposureTime);
 			printf("\nExposure = %x ", exposureTime);
 			break;
 		}
-		case 'x': {
+		case 'j': {
 			exposureTime -= EXPOSURE_STEP;
 			OV8865SetExposure(exposureTime);
 			printf("\nExposure = %x ", exposureTime);
 			break;
 		}
-		case 'c': {
+		case 'K': {
 			gain += GAIN_STEP;
 			OV8865SetGain(gain);
 			printf("\nGain = %x ", gain);
 			break;
 		}
-		case 'v': {
+		case 'k': {
 			gain -= GAIN_STEP;
 			OV8865SetGain(gain);
 			printf("\nGain = %x ", gain);
 			break;
 		}
-		case 'b': {
+		case 'L': {
 			current_focus += manual_focus_step;
 			if (current_focus > 1023)
 				current_focus = 1023;
@@ -367,140 +386,402 @@ int main() {
 			printf("\nFocus = %x ", current_focus);
 			break;
 		}
-		case 'n': {
+		case 'l': {
 			if (current_focus > manual_focus_step)
 				current_focus -= manual_focus_step;
 			OV8865_FOCUS_Move_to(current_focus);
 			printf("\nFocus = %x ", current_focus);
 			break;
 		}
-		case 'q': {
+
+		//BLUE HSV COLOR MAPPING
+		case 'U': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0001);
 			blue_hl = blue_hl + hue_step;;
 			printf("\nBlue Lower Hue increased to %d", blue_hl);
 			break;
 		}
-		case 'a': {
+		case 'u': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0002);
 			blue_hl -= hue_step;
-			printf("\nBlue Lower Hue increased to %d", blue_hl);
+			printf("\nBlue Lower Hue decreased to %d", blue_hl);
 			break;
 		}
-		case 'w': {
+		case '&': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0003);
 			blue_hu += hue_step;
 			printf("\nBlue Upper Hue increased to %d", blue_hu);
 			break;
 		}
-		case 's': {
+		case '7': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0004);
 			blue_hu -= hue_step;
 			printf("\nBlue Upper Hue decreased to %d", blue_hu);
 			break;
 		}
-		case 'e': {
+		case 'i': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0005);
+			blue_sl += hue_step;
+			printf("\nBlue Lower Saturation increased to %d", blue_sl);
+			break;
+		}
+		case 'I': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0006);
+			blue_sl -= hue_step;
+			printf("\nBlue Lower Saturation decreased to %d", blue_sl);
+			break;
+		}
+		case '*': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0007);
+			blue_su += hue_step;
+			printf("\nBlue Upper Saturation increased to %d", blue_su);
+			break;
+		}
+		case '8': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0008);
+			blue_su -= hue_step;
+			printf("\nBlue Upper Saturation decreased to %d", blue_su);
+			break;
+		}
+		case 'O': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0009);
+			blue_vl += hue_step;
+			printf("\nBlue Lower Value increased to %d", blue_vl);
+			break;
+		}
+		case 'o': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x000a);
+			blue_vl -= hue_step;
+			printf("\nBlue Lower Value decreased to %d", blue_vl);
+			break;
+		}
+		case '(': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x000b);
+			blue_vu += hue_step;
+			printf("\nBlue Lower Value increased to %d", blue_vu);
+			break;
+		}
+		case '9': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x000c);
+			blue_vu -= hue_step;
+			printf("\nBlue Lower Value decreased to %d", blue_vu);
+			break;
+		}
+
+		//GREEN HSV COLOR MAPPING
+		case 'R': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1001);
 			green_hl += hue_step;
 			printf("\nGreen Lower Hue increased to %d", green_hl);
 			break;
 		}
-		case 'd': {
+		case 'r': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1002);
 			green_hl -= hue_step;
-			printf("\nGreen Lower Hue increased to %d", green_hl);
+			printf("\nGreen Lower Hue decreased to %d", green_hl);
 			break;
 		}
-		case 'r': {
+		case '$': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1003);
 			green_hu += hue_step;
 			printf("\nGreen upper Hue increased to %d", green_hu);
 			break;
 		}
-		case 'f': {
+		case '4': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1004);
 			green_hu -= hue_step;
-			printf("\nGreen upper Hue increased to %d", green_hu);
+			printf("\nGreen upper Hue decreased to %d", green_hu);
+			break;
+		}
+		case 'T': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1005);
+			green_sl += hue_step;
+			printf("\ngreen Lower Saturation increased to %d", green_sl);
 			break;
 		}
 		case 't': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1006);
+			green_sl -= hue_step;
+			printf("\ngreen Lower Saturation decreased to %d", green_sl);
+			break;
+		}
+		case '%': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1007);
+			green_su += hue_step;
+			printf("\ngreen Lower Saturation increased to %d", green_su);
+			break;
+		}
+		case '5': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1008);
+			green_su -= hue_step;
+			printf("\ngreen Lower Saturation decreased to %d", green_su);
+			break;
+		}
+		case 'Y': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1009);
+			green_vl += hue_step;
+			printf("\ngreen Lower Value increased to %d", green_vl);
+			break;
+		}
+		case 'y': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x100a);
+			green_vl -= hue_step;
+			printf("\ngreen Lower Value decreased to %d", green_vl);
+			break;
+		}
+		case '^': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x100b);
+			green_vu += hue_step;
+			printf("\ngreen Lower Value increased to %d", green_vu);
+			break;
+		}
+		case '6': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x100c);
+			green_vu -= hue_step;
+			printf("\ngreen Lower Value decreased to %d", green_vu);
+			break;
+		}
+
+
+		//RED HSV COLOR MAPPING
+		case 'Q': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2001);
 			red_hl += hue_step;
 			printf("\nRed Lower Hue increased to %d", red_hl);
 			break;
 		}
-		case 'g': {
+		case 'q': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2002);
 			red_hl -= hue_step;
-			printf("\nRed Lower Hue increased to %d", red_hl);
+			printf("\nRed Lower Hue decreased to %d", red_hl);
 			break;
 		}
-		case 'y': {
+		case '!': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2003);
 			red_hu += hue_step;
 			printf("\nRed upper Hue increased to %d", red_hu);
 			break;
 		}
-		case 'h': {
+		case '1': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2004);
 			red_hu -= hue_step;
-			printf("\nRed upper Hue increased to %d", red_hu);
+			printf("\nRed upper Hue decreased to %d", red_hu);
 			break;
 		}
-		case 'u': {
+		case 'W': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2005);
+			red_sl += hue_step;
+			printf("\nred Lower Saturation increased to %d", red_sl);
+			break;
+		}
+		case 'w': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2006);
+			red_sl -= hue_step;
+			printf("\nred Lower Saturation decreased to %d", red_sl);
+			break;
+		}
+		case '@': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2007);
+			red_su += hue_step;
+			printf("\nred Upper Saturation increased to %d", red_su);
+			break;
+		}
+		case '2': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2008);
+			red_su -= hue_step;
+			printf("\nred Upper Saturation decreased to %d", red_su);
+			break;
+		}
+		case 'E': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x2009);
+			red_vl += hue_step;
+			printf("\nred Lower Value increased to %d", red_vl);
+			break;
+		}
+		case 'e': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x200a);
+			red_vl -= hue_step;
+			printf("\nred Lower Value decreased to %d", red_vl);
+			break;
+		}
+		case '#': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x200b);
+			red_vu += hue_step;
+			printf("\nred Upper Value increased to %d", red_vu);
+			break;
+		}
+		case '3': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x200c);
+			red_vu -= hue_step;
+			printf("\nred Upper Saturation decreased to %d", red_vu);
+			break;
+		}
+
+		//YELLOW HSV COLOR MAPPING
+		case 'Z': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3001);
 			yellow_hl += hue_step;
 			printf("\nYellow Lower Hue increased to %d", yellow_hl);
 			break;
 		}
-		case 'j': {
+		case 'z': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3002);
 			yellow_hl -= hue_step;
-			printf("\nYellow Lower Hue increased to %d", yellow_hl);
+			printf("\nYellow Lower Hue decreased to %d", yellow_hl);
 			break;
 		}
-		case 'i': {
+		case 'A': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3003);
 			yellow_hu += hue_step;
 			printf("\nYellow upper Hue increased to %d", yellow_hu);
 			break;
 		}
-		case 'k': {
+		case 'a': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3004);
 			yellow_hu -= hue_step;
-			printf("\nYellow upper Hue increased to %d", yellow_hu);
+			printf("\nYellow upper Hue decreased to %d", yellow_hu);
 			break;
 		}
-		case 'o': {
+		case 'X': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3005);
+			yellow_sl += hue_step;
+			printf("\nyellow Lower Saturation increased to %d", yellow_sl);
+			break;
+		}
+		case 'x': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3006);
+			yellow_sl -= hue_step;
+			printf("\nyellow Lower Saturation decreased to %d", yellow_sl);
+			break;
+		}
+		case 'S': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3007);
+			yellow_su += hue_step;
+			printf("\nyellow Upper Saturation increased to %d", yellow_su);
+			break;
+		}
+		case 's': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3008);
+			yellow_su -= hue_step;
+			printf("\nyellow Upper Saturation decreased to %d", yellow_su);
+			break;
+		}
+		case 'C': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x3009);
+			yellow_vl += hue_step;
+			printf("\nyellow Lower Value increased to %d", yellow_vl);
+			break;
+		}
+		case 'c': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x300a);
+			yellow_vl -= hue_step;
+			printf("\nyellow Lower Value decreased to %d", yellow_vl);
+			break;
+		}
+		case 'D': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x300b);
+			yellow_vu += hue_step;
+			printf("\nyellow Upper Value increased to %d", yellow_vu);
+			break;
+		}
+		case 'd': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x300c);
+			yellow_vu -= hue_step;
+			printf("\nyellow Upper Value decreased to %d", yellow_vu);
+			break;
+		}
+
+		//PINK HSV COLOR MAPPING
+		case 'V': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4001);
 			pink_hl += hue_step;
 			printf("\nPink Lower Hue increased to %d", pink_hl);
 			break;
 		}
-		case 'l': {
+		case 'v': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4002);
 			pink_hl -= hue_step;
-			printf("\nPink Lower Hue increased to %d", pink_hl);
+			printf("\nPink Lower Hue decreased to %d", pink_hl);
 			break;
 		}
-		case 'p': {
+		case 'F': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4003);
 			pink_hu += hue_step;
 			printf("\nPink upper Hue increased to %d", pink_hu);
 			break;
 		}
-		case ';': {
+		case 'f': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4004);///
 			pink_hu -= hue_step;
-			printf("\nPink upper Hue increased to %d", pink_hu);
+			printf("\nPink upper Hue decreased to %d", pink_hu);
 			break;
 		}
+		case 'B': {
+				IOWR(0x42000, EEE_IMGPROC_MSG, 0x4005);
+			pink_sl += hue_step;
+			printf("\npink Lower Saturation increased to %d", pink_sl);
+			break;
+		}
+		case 'b': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4006);
+			pink_sl -= hue_step;
+			printf("\npink Lower Saturation decreased to %d", pink_sl);
+			break;
+		}
+		case 'G': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4007);
+			pink_su += hue_step;
+			printf("\npink Upper Saturation increased to %d", pink_su);
+			break;
+		}
+		case 'g': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4008);
+			pink_su -= hue_step;
+			printf("\npink Upper Saturation decreased to %d", pink_su);
+			break;
+		}
+		case 'N': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x4009);
+			pink_vl += hue_step;
+			printf("\npink Lower Value increased to %d", pink_vl);
+			break;
+		}
+		case 'n': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x400a);
+			pink_vl -= hue_step;
+			printf("\npink Lower Value decreased to %d", pink_vl);
+			break;
+		}
+		case 'H': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x400b);
+			pink_vu += hue_step;
+			printf("\npink Upper Value increased to %d", pink_vu);
+			break;
+		}
+		case 'h': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x400c);
+			pink_vu -= hue_step;
+			printf("\npink Upper Value decreased to %d", pink_vu);
+			break;
+		}
+
+		//Vision Modes
 		case '/': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0100);
 			filtered+=1;
 			if(filtered%2) {
-				printf("\nFilter OFF");
+				printf("\nFilter OFF\n");
 			} else {
-				printf("\nFilter ON");
+				printf("\nFilter ON\n");
+			}
+			break;
+		}case ';': {
+			if(mode == 0){
+				mode = 1;
+				printf("\nColor config mode ON\n" );
+			}else{
+				mode = 0;
+				printf("\nColor config mode OFF\n" );
 			}
 			break;
 		}

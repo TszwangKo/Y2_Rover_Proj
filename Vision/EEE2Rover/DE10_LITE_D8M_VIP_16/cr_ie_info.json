@@ -7,11 +7,11 @@
 	"error" : {
 		"executable" : "quartus",
 		"comment" : "none",
-		"error_message" : "Access Violation at 0X00007FF9ACFCA4B6",
-		"source_file" : "unknown",
-		"line" : "0",
-		"stack_trace" : "\t0x7ff9acfca4b5: CCL_FIO + 0xa4b5 (?fio_display_path_too_long_assert_message@@YAXPEBD@Z + 0x85)\n\t0x7ff9acfcb735: CCL_FIO + 0xb735 (?fullpath@FIO_PATH@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ + 0x45)\n\t0x7ff93433bad6: pgm_pgme + 0x3bad6 (?engage_ocpp_mode@PGME_PROGRAMMER@@QEAA_NPEAV?$vector@PEAVPGM_CHAIN_ELEMENT@@V?$allocator@PEAVPGM_CHAIN_ELEMENT@@@std@@@std@@@Z + 0x8d6)\n\t 0x544f95b7: QtCore4 + 0x295b7 (?start@QThread@@QEAAXW4Priority@1@@Z + 0x427)\n\t0x7ff9b04c4f7e: MSVCR120 + 0x24f7e (_beginthreadex + 0x106)\n\t0x7ff9b04c5125: MSVCR120 + 0x25125 (_endthreadex + 0x191)\n\t0x7ff9c80a7033: KERNEL32 + 0x17033 (BaseThreadInitThunk + 0x13)\n\t0x7ff9ca002650: ntdll + 0x52650 (RtlUserThreadStart + 0x20)\n",
-		"subsystem" : "unknown"
+		"error_message" : "Path (length 1): \n",
+		"source_file" : "/quartus/ccl/fio/fio_path.cpp",
+		"line" : "83",
+		"stack_trace" : "\t0x7ff9b14646ad: CCL_ERR + 0x46ad (?err_report_internal_error@@YAXPEBD00H@Z + 0x2d)\n\t0x7ff9b14ca659: CCL_FIO + 0xa659 (?fio_display_path_too_long_assert_message@@YAXPEBD@Z + 0x229)\n\t0x7ff9b14cb735: CCL_FIO + 0xb735 (?fullpath@FIO_PATH@@QEBA?AV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@XZ + 0x45)\n\t0x7ff9544abad6: pgm_pgme + 0x3bad6 (?engage_ocpp_mode@PGME_PROGRAMMER@@QEAA_NPEAV?$vector@PEAVPGM_CHAIN_ELEMENT@@V?$allocator@PEAVPGM_CHAIN_ELEMENT@@@std@@@std@@@Z + 0x8d6)\n\t 0x5fc995b7: QtCore4 + 0x295b7 (?start@QThread@@QEAAXW4Priority@1@@Z + 0x427)\n\t0x7ff9b2fb4f7e: MSVCR120 + 0x24f7e (_beginthreadex + 0x106)\n\t0x7ff9b2fb5125: MSVCR120 + 0x25125 (_endthreadex + 0x191)\n\t0x7ff9cbb27033: KERNEL32 + 0x17033 (BaseThreadInitThunk + 0x13)\n\t0x7ff9cc0a2650: ntdll + 0x52650 (RtlUserThreadStart + 0x20)\n",
+		"subsystem" : "FIO"
 	},
 	"quartus" : {
 		"quartus_bits" : "64",
