@@ -135,11 +135,11 @@ wire red_detect,blue_detect,yellow_detect,green_detect,pink_detect;
 //wire [8:0] blue_hl, blue_hh;
 
 //assign red_detect = red[7] & ~green[7] & ~blue[7];
-assign red_detect = (hsv_h0 > red_hl) & (hsv_h0 < red_hu) & (hsv_s0 > 40) & (hsv_v0 > 20);
-assign blue_detect = (hsv_h0 > blue_hl) & (hsv_h0 < blue_hu) & (hsv_s0 > 40) & (hsv_v0 > 25);
-assign yellow_detect = (hsv_h0 > yellow_hl) & (hsv_h0 < yellow_hu) & (hsv_s0 > 5) & (hsv_v0 > 40);
-assign green_detect = (hsv_h0 > green_hl) & (hsv_h0 < green_hu) & (hsv_s0 > 70) & (hsv_v0 > 20);
-assign pink_detect = (hsv_h0 > pink_hl) & (hsv_h0 < pink_hu) & (hsv_s0 > 30) & (hsv_v0 > 20) ;
+assign red_detect = (hsv_h0 > red_hl) & (hsv_h0 < red_hu) & (hsv_s0 > red_sl) & (hsv_s0 < red_su) & (hsv_v0 > red_vl) & (hsv_s0 < red_vu);
+assign blue_detect = (hsv_h0 > blue_hl) & (hsv_h0 < blue_hu) & (hsv_s0 > blue_sl) & (hsv_s0 < blue_su) & (hsv_v0 > blue_vl) & (hsv_s0 < blue_vu);
+assign yellow_detect = (hsv_h0 > yellow_hl) & (hsv_h0 < yellow_hu) & (hsv_s0 > yellow_sl) & (hsv_s0 < yellow_su) & (hsv_v0 > yellow_vl) & (hsv_s0 < yellow_vu);
+assign green_detect = (hsv_h0 > green_hl) & (hsv_h0 < green_hu) & (hsv_s0 > green_sl) & (hsv_s0 < green_su) & (hsv_v0 > green_vl) & (hsv_s0 < green_vu);
+assign pink_detect = (hsv_h0 > pink_hl) & (hsv_h0 < pink_hu) & (hsv_s0 > pink_sl) & (hsv_s0 < pink_su) & (hsv_v0 > pink_vl) & (hsv_s0 < pink_vu);
 
 // Find boundary of cursor box
 
@@ -156,11 +156,11 @@ assign pink_high  =  pink_detect ? {8'hff, 8'hcf, 8'hE2} : {grey, grey, grey};
 // Show bounding boxs
 wire [23:0] new_image;
 wire bb_active_r, bb_active_b, bb_active_y, bb_active_g, bb_active_p;
-assign bb_active_r = (x == left_r) | (x == right_r) | (y == top_r) | (y == bottom_r);
-assign bb_active_b = (x == left_b) | (x == right_b) | (y == top_b) | (y == bottom_b);
-assign bb_active_y = (x == left_y) | (x == right_y) | (y == top_y) | (y == bottom_y);
-assign bb_active_g = (x == left_g) | (x == right_g) | (y == top_g) | (y == bottom_g);
-assign bb_active_p = (x == left_p) | (x == right_p) | (y == top_p) | (y == bottom_p);
+assign bb_active_r = (x == left) | (x == right) | (y == top) | (y == bottom);
+//assign bb_active_b = (x == left_b) | (x == right_b) | (y == top_b) | (y == bottom_b);
+//assign bb_active_y = (x == left_y) | (x == right_y) | (y == top_y) | (y == bottom_y);
+//assign bb_active_g = (x == left_g) | (x == right_g) | (y == top_g) | (y == bottom_g);
+//assign bb_active_p = (x == left_p) | (x == right_p) | (y == top_p) | (y == bottom_p);
 
 //always@(*) begin
 //	if (bb_active_r) begin
@@ -283,21 +283,47 @@ end
 
 //Process bounding box at the end of the frame.
 reg [3:0] msg_state;
-reg [10:0] left_r, right_r, top_r, bottom_r;
-reg [10:0] left_b, right_b, top_b, bottom_b;
-reg [10:0] left_y, right_y, top_y, bottom_y;
-reg [10:0] left_g, right_g, top_g, bottom_g;
-reg [10:0] left_p, right_p, top_p, bottom_p;
+reg [10:0] left, right, top, bottom;
+//reg [10:0] left_b, right_b, top_b, bottom_b;
+//reg [10:0] left_y, right_y, top_y, bottom_y;
+//reg [10:0] left_g, right_g, top_g, bottom_g;
+//reg [10:0] left_p, right_p, top_p, bottom_p;
 reg [7:0] frame_count;
 always@(posedge clk) begin
 	if (eop & in_valid & packet_video) begin  //Ignore non-video packets
 		
 		//Latch edges for display overlay on next frame
-		left_r <= x_min_r;
-		right_r <= x_max_r;
-		top_r <= y_min_r;
-		bottom_r <= y_max_r;
-		
+		if(bound_col==0) begin
+			left <= x_min_r;
+			right <= x_max_r;
+			top <= y_min_r;
+			bottom <= y_max_r;
+		end else if(bound_col==1) begin
+			left <= x_min_g;
+			right <= x_max_g;
+			top <= y_min_g;
+			bottom <= y_max_g;
+		end else if(bound_col==2) begin
+			left <= x_min_b;
+			right <= x_max_b;
+			top <= y_min_b;
+			bottom <= y_max_b;
+		end else if(bound_col==3) begin
+			left <= x_min_y;
+			right <= x_max_y;
+			top <= y_min_y;
+			bottom <= y_max_y;
+		end else if(bound_col==4) begin
+			left <= x_min_p;
+			right <= x_max_p;
+			top <= y_min_p;
+			bottom <= y_max_p;
+		end else begin
+			left <= x_min_r;
+			right <= x_max_r;
+			top <= y_min_r;
+			bottom <= y_max_r;
+		end
 		
 		//Start message writer FSM once every MSG_INTERVAL frames, if there is room in the FIFO
 		frame_count <= frame_count - 1;
@@ -491,6 +517,7 @@ reg	[7:0]		green_vl, green_vu;
 reg	[7:0]		red_vl, red_vu;
 reg	[7:0]		yellow_vl, yellow_vu;
 reg	[7:0]		pink_vl, pink_vu;
+reg   [3:0]    bound_col;
 
 integer step = 9'd5;
 always @ (posedge clk)
@@ -534,6 +561,7 @@ begin
 		pink_vl <= 8'd0;
 		pink_vu <= 8'hff;
 		
+		bound_col <= 4'h0;
 		
 	end
 	else begin
@@ -549,21 +577,21 @@ begin
 						end else if (s_writedata[31:0] == 32'h0004) begin
 							blue_hu <= blue_hu - step;
 						end else if (s_writedata[31:0] == 32'h0005) begin
-							blue_sl <= blue_hu + step;
+							blue_sl <= blue_sl + step;
 						end else if (s_writedata[31:0] == 32'h0006) begin
-							blue_sl <= blue_hu - step;
+							blue_sl <= blue_sl - step;
 						end else if (s_writedata[31:0] == 32'h0007) begin
-							blue_su <= blue_hu + step;
+							blue_su <= blue_su + step;
 						end else if (s_writedata[31:0] == 32'h0008) begin
-							blue_su <= blue_hu - step;
+							blue_su <= blue_su - step;
 						end else if (s_writedata[31:0] == 32'h0009) begin
-							blue_vl <= blue_hu + step;
+							blue_vl <= blue_vl + step;
 						end else if (s_writedata[31:0] == 32'h000a) begin
-							blue_vl <= blue_hu - step;
+							blue_vl <= blue_vl - step;
 						end else if (s_writedata[31:0] == 32'h000b) begin
-							blue_vu <= blue_hu + step;
+							blue_vu <= blue_vu + step;
 						end else if (s_writedata[31:0] == 32'h000c) begin
-							blue_vu <= blue_hu - step;
+							blue_vu <= blue_vu - step;
 						end 
 						
 						
@@ -577,21 +605,21 @@ begin
 						end else if (s_writedata[31:0] == 32'h1004) begin
 							green_hu <= green_hu - step;
 						end else if (s_writedata[31:0] == 32'h1005) begin
-							green_sl <= green_hu + step;
+							green_sl <= green_sl + step;
 						end else if (s_writedata[31:0] == 32'h1006) begin
-							green_sl <= green_hu - step;
+							green_sl <= green_sl - step;
 						end else if (s_writedata[31:0] == 32'h1007) begin
-							green_su <= green_hu + step;
+							green_su <= green_su + step;
 						end else if (s_writedata[31:0] == 32'h1008) begin
-							green_su <= green_hu - step;
+							green_su <= green_su - step;
 						end else if (s_writedata[31:0] == 32'h1009) begin
-							green_vl <= green_hu + step;
+							green_vl <= green_vl + step;
 						end else if (s_writedata[31:0] == 32'h100a) begin
-							green_vl <= green_hu - step;
+							green_vl <= green_vl - step;
 						end else if (s_writedata[31:0] == 32'h100b) begin
-							green_vu <= green_hu + step;
+							green_vu <= green_vu + step;
 						end else if (s_writedata[31:0] == 32'h100c) begin
-							green_vu <= green_hu - step;
+							green_vu <= green_vu - step;
 						end 
 						else if(s_writedata[31:0] == 32'h2001) begin
 							red_hl <= red_hl + step;
@@ -602,21 +630,21 @@ begin
 						end else if (s_writedata[31:0] == 32'h2004) begin
 							red_hu <= red_hu - step;
 						end else if (s_writedata[31:0] == 32'h2005) begin
-							red_sl <= red_hu + step;
+							red_sl <= red_sl + step;
 						end else if (s_writedata[31:0] == 32'h2006) begin
-							red_sl <= red_hu - step;
+							red_sl <= red_sl - step;
 						end else if (s_writedata[31:0] == 32'h2007) begin
-							red_su <= red_hu + step;
+							red_su <= red_su + step;
 						end else if (s_writedata[31:0] == 32'h2008) begin
-							red_su <= red_hu - step;
+							red_su <= red_su - step;
 						end else if (s_writedata[31:0] == 32'h2009) begin
-							red_vl <= red_hu + step;
+							red_vl <= red_vl + step;
 						end else if (s_writedata[31:0] == 32'h200a) begin
-							red_vl <= red_hu - step;
+							red_vl <= red_vl - step;
 						end else if (s_writedata[31:0] == 32'h200b) begin
-							red_vu <= red_hu + step;
+							red_vu <= red_vu + step;
 						end else if (s_writedata[31:0] == 32'h200c) begin
-							red_vu <= red_hu - step;
+							red_vu <= red_vu - step;
 						end 
 						
 						else if(s_writedata[31:0] == 32'h3001) begin
@@ -628,21 +656,21 @@ begin
 						end else if (s_writedata[31:0] == 32'h3004) begin
 							yellow_hu <= yellow_hu - step;
 						end  else if (s_writedata[31:0] == 32'h3005) begin
-							yellow_sl <= yellow_hu + step;
+							yellow_sl <= yellow_sl + step;
 						end else if (s_writedata[31:0] == 32'h3006) begin
-							yellow_sl <= yellow_hu - step;
+							yellow_sl <= yellow_sl - step;
 						end else if (s_writedata[31:0] == 32'h3007) begin
-							yellow_su <= yellow_hu + step;
+							yellow_su <= yellow_su + step;
 						end else if (s_writedata[31:0] == 32'h3008) begin
-							yellow_su <= yellow_hu - step;
+							yellow_su <= yellow_su - step;
 						end else if (s_writedata[31:0] == 32'h3009) begin
-							yellow_vl <= yellow_hu + step;
+							yellow_vl <= yellow_vl + step;
 						end else if (s_writedata[31:0] == 32'h300a) begin
-							yellow_vl <= yellow_hu - step;
+							yellow_vl <= yellow_vl - step;
 						end else if (s_writedata[31:0] == 32'h300b) begin
-							yellow_vu <= yellow_hu + step;
+							yellow_vu <= yellow_vu + step;
 						end else if (s_writedata[31:0] == 32'h300c) begin
-							yellow_vu <= yellow_hu - step;
+							yellow_vu <= yellow_vu - step;
 						end 
 						else if(s_writedata[31:0] == 32'h4001) begin
 							pink_hl <= pink_hl + step;
@@ -653,24 +681,34 @@ begin
 						end else if (s_writedata[31:0] == 32'h4004) begin
 							pink_hu <= pink_hu - step;
 						end else if (s_writedata[31:0] == 32'h4005) begin
-							pink_sl <= pink_hu + step;
+							pink_sl <= pink_sl + step;
 						end else if (s_writedata[31:0] == 32'h4006) begin
-							pink_sl <= pink_hu - step;
+							pink_sl <= pink_sl - step;
 						end else if (s_writedata[31:0] == 32'h4007) begin
-							pink_su <= pink_hu + step;
+							pink_su <= pink_su + step;
 						end else if (s_writedata[31:0] == 32'h4008) begin
-							pink_su <= pink_hu - step;
+							pink_su <= pink_su - step;
 						end else if (s_writedata[31:0] == 32'h4009) begin
-							pink_vl <= pink_hu + step;
+							pink_vl <= pink_vl + step;
 						end else if (s_writedata[31:0] == 32'h400a) begin
-							pink_vl <= pink_hu - step;
+							pink_vl <= pink_vl - step;
 						end else if (s_writedata[31:0] == 32'h400b) begin
-							pink_vu <= pink_hu + step;
+							pink_vu <= pink_vu + step;
 						end else if (s_writedata[31:0] == 32'h400c) begin
-							pink_vu <= pink_hu - step;
+							pink_vu <= pink_vu - step;
 						end 
 						else if(s_writedata[31:0] == 32'h0100) begin
 							filter_mode <= !filter_mode;
+						end else if(s_writedata[31:0] == 32'h0200) begin
+							bound_col <= 4'h0;
+						end else if(s_writedata[31:0] == 32'h0201) begin
+							bound_col <= 4'h1;
+						end else if(s_writedata[31:0] == 32'h0202) begin
+							bound_col <= 4'h2;
+						end else if(s_writedata[31:0] == 32'h0203) begin
+							bound_col <= 4'h3;
+						end else if(s_writedata[31:0] == 32'h0204) begin
+							bound_col <= 4'h4;
 						end 
 			end
 		   if      (s_address == `REG_BBCOL)	bb_col <= s_writedata[23:0];

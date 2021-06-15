@@ -354,31 +354,31 @@ int main() {
 		int hue_step = 5;
 		int in = getchar();
 		switch (in) {
-		case 'J': {
+		case ')': {
 			exposureTime += EXPOSURE_STEP;
 			OV8865SetExposure(exposureTime);
 			printf("\nExposure = %x ", exposureTime);
 			break;
 		}
-		case 'j': {
+		case '0': {
 			exposureTime -= EXPOSURE_STEP;
 			OV8865SetExposure(exposureTime);
 			printf("\nExposure = %x ", exposureTime);
 			break;
 		}
-		case 'K': {
+		case '_': {
 			gain += GAIN_STEP;
 			OV8865SetGain(gain);
 			printf("\nGain = %x ", gain);
 			break;
 		}
-		case 'k': {
+		case '-': {
 			gain -= GAIN_STEP;
 			OV8865SetGain(gain);
 			printf("\nGain = %x ", gain);
 			break;
 		}
-		case 'L': {
+		case '+': {
 			current_focus += manual_focus_step;
 			if (current_focus > 1023)
 				current_focus = 1023;
@@ -386,7 +386,7 @@ int main() {
 			printf("\nFocus = %x ", current_focus);
 			break;
 		}
-		case 'l': {
+		case '=': {
 			if (current_focus > manual_focus_step)
 				current_focus -= manual_focus_step;
 			OV8865_FOCUS_Move_to(current_focus);
@@ -419,13 +419,13 @@ int main() {
 			printf("\nBlue Upper Hue decreased to %d", blue_hu);
 			break;
 		}
-		case 'i': {
+		case 'I': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0005);
 			blue_sl += hue_step;
 			printf("\nBlue Lower Saturation increased to %d", blue_sl);
 			break;
 		}
-		case 'I': {
+		case 'i': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0006);
 			blue_sl -= hue_step;
 			printf("\nBlue Lower Saturation decreased to %d", blue_sl);
@@ -458,13 +458,13 @@ int main() {
 		case '(': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x000b);
 			blue_vu += hue_step;
-			printf("\nBlue Lower Value increased to %d", blue_vu);
+			printf("\nBlue Upper Value increased to %d", blue_vu);
 			break;
 		}
 		case '9': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x000c);
 			blue_vu -= hue_step;
-			printf("\nBlue Lower Value decreased to %d", blue_vu);
+			printf("\nBlue Upper Value decreased to %d", blue_vu);
 			break;
 		}
 
@@ -508,13 +508,13 @@ int main() {
 		case '%': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1007);
 			green_su += hue_step;
-			printf("\ngreen Lower Saturation increased to %d", green_su);
+			printf("\ngreen Upper Saturation increased to %d", green_su);
 			break;
 		}
 		case '5': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x1008);
 			green_su -= hue_step;
-			printf("\ngreen Lower Saturation decreased to %d", green_su);
+			printf("\ngreen Upper Saturation decreased to %d", green_su);
 			break;
 		}
 		case 'Y': {
@@ -532,13 +532,13 @@ int main() {
 		case '^': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x100b);
 			green_vu += hue_step;
-			printf("\ngreen Lower Value increased to %d", green_vu);
+			printf("\ngreen Upper Value increased to %d", green_vu);
 			break;
 		}
 		case '6': {
 			IOWR(0x42000, EEE_IMGPROC_MSG, 0x100c);
 			green_vu -= hue_step;
-			printf("\ngreen Lower Value decreased to %d", green_vu);
+			printf("\ngreen Upper Value decreased to %d", green_vu);
 			break;
 		}
 
@@ -775,7 +775,7 @@ int main() {
 				printf("\nFilter ON\n");
 			}
 			break;
-		}case ';': {
+		}case '.': {
 			if(mode == 0){
 				mode = 1;
 				printf("\nColor config mode ON\n" );
@@ -783,6 +783,26 @@ int main() {
 				mode = 0;
 				printf("\nColor config mode OFF\n" );
 			}
+			break;
+		}case 'j': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0200);
+			printf("Bounding Color Red");
+			break;
+		}case 'k': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0201);
+			printf("Bounding Color Green");
+			break;
+		}case 'l': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0202);
+			printf("Bounding Color Blue");
+			break;
+		}case ';': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0203);
+			printf("Bounding Color Yellow");
+			break;
+		}case '\'': {
+			IOWR(0x42000, EEE_IMGPROC_MSG, 0x0204);
+			printf("Bounding Color Pink");
 			break;
 		}
 
