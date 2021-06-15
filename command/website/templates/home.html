@@ -107,7 +107,16 @@ Network Status: Disconnected
 
 &nbsp;&nbsp;
 
+{% if battery == None %}
+
+Battery: N/A
+
+{% else %}
+
 {{"Battery: "}} {{battery}} {{"%"}}
+
+{% endif %}
+
 
 &nbsp;
 
@@ -127,6 +136,10 @@ Network Status: Disconnected
 
 <img src="{{ url_for('static', filename='battery_25.jpg') }}" alt="Percentage: 25 %">
 
+{% elif battery == None %}
+
+
+
 {% else %}
 
 <img src="{{ url_for('static', filename='battery_0.jpg') }}" alt="Percentage: 0 %">
@@ -134,13 +147,28 @@ Network Status: Disconnected
 {% endif %}
 
 &nbsp;&nbsp;
+<form method="POST">
+    {% if current_state == "Idle" %}
+        <input type="submit" name="state" value="Charging" class="btn btn-primary"/>
+        <input type="submit" name="state" value="Idle" class="btn btn-primary active"/>
+        <input type="submit" name="state" value="Rover_on" class="btn btn-primary"/>
+    {% elif current_state == "Charging" %}
+        <input type="submit" name="state" value="Charging" class="btn btn-primary active"/>
+        <input type="submit" name="state" value="Idle" class="btn btn-primary"/>
+        <input type="submit" name="state" value="Rover_on" class="btn btn-primary"/>
+    {% else %}
+        <input type="submit" name="state" value="Charging" class="btn btn-primary"/>
+        <input type="submit" name="state" value="Idle" class="btn btn-primary"/>
+        <input type="submit" name="state" value="Rover_on" class="btn btn-primary active"/>
+    {% endif %}
+</form>
 
-{{"Speed: "}} {{speed}} 
+
 
 <h2 style="text-align:center">Action/Response Log</h2>
 
 {% for action in log%}
-    {{action[0]}} {{" - "}} {{action[1]}} {{" - "}} {{action[2]}}
+    {{action[0]}} {{" - "}} {{action[1]}} 
     <br />
 {% endfor %}
 

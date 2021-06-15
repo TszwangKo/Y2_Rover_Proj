@@ -182,7 +182,7 @@ def heuristic(a: GridLocation, b: GridLocation) -> float:
     (x2, y2) = b
     return abs(x1 - x2) + abs(y1 - y2)
 
-def a_star_search(graph: SquareGridNeighborOrder, start: Location, goal: Location):
+def a_star_search(graph: SquareGridNeighborOrder, start: Location, goal: Location, visited):
     frontier = PriorityQueue()
     frontier.put(start, 0)
     came_from: Dict[Location, Optional[Location]] = {}
@@ -197,7 +197,7 @@ def a_star_search(graph: SquareGridNeighborOrder, start: Location, goal: Locatio
             break
         
         for next in graph.neighbors(current):
-            new_cost = cost_so_far[current] + graph.cost(current, next)
+            new_cost = cost_so_far[current] + graph.cost(current, next,visited)
             if next not in cost_so_far or new_cost < cost_so_far[next]:
                 cost_so_far[next] = new_cost
                 priority = new_cost + heuristic(next, goal)
@@ -233,13 +233,17 @@ class SquareGridNeighborOrder(SquareGrid):
         results = filter(self.passable, results)
         return list(results)
 
-    def cost(self, from_node: GridLocation, to_node: GridLocation) -> float:
+    def cost(self, from_node: GridLocation, to_node: GridLocation, weight) -> float:
         (x1, y1) = from_node
         (x2, y2) = to_node
+        found=0
+        if len(weight):
+            if weight[y2][x2] == 1:
+                found=5
         if abs(x1 - x2) + abs(y1 - y2) == 2:
-            return 14
+            return 14+found
         else:
-            return 10
+            return 10+found
 
 def test_with_custom_order(neighbor_order):
     if neighbor_order:
@@ -254,12 +258,12 @@ def test_with_custom_order(neighbor_order):
     draw_grid(g, path=reconstruct_path(came_from, start=start, goal=goal),
               point_to=came_from, start=start, goal=goal)
 
-def path_finder(start,goal,obstacles,searchsize_x,searchsize_y):
+def path_finder(start,goal,obstacles,searchsize_x,searchsize_y,visited):
     g = SquareGridNeighborOrder(searchsize_x,searchsize_y)
     g.NEIGHBOR_ORDER = [(+1, 0), (0, -1), (-1, 0), (0, +1), (-1, -1), (-1, +1), (+1, -1), (+1, +1)]
 
     g.walls = obstacles
-    came_from = a_star_search(g, start, goal)
+    came_from = a_star_search(g, start, goal,visited)
     draw_grid(g, path=reconstruct_path(came_from, start=start, goal=goal),
               point_to=came_from, start=start, goal=goal)
     return came_from

@@ -1,13 +1,13 @@
 from website import create_app
 
-#to do:
-#response log
-#speed?
-#Battery percentage
-#visual representation of the map
-#map of what vision saw
-#frontend prettier????
+"""
+to do:
+primary key should be x and y location
+(weighted map/turning) increase efficiency
+exchange info with control
+code refactoring
 
+"""
 
 app=create_app()
 
